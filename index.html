@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+        <!-- Slide meta data, remove/edit as you see fit -->
+        <title>JSQ&BP</title>
+        <meta name="generator" content="Organic" />
+        <meta name="author" content="Tautvilas Mečinskas" />
+        <meta name="company" content="Mediapark" />
+        <meta name="email" content="tautvilas@mediapark.lt" />
+        <meta name="date" content="2012-02-01" />
+        <!-- Slippy core file and dependencies -->
+        <script type="text/javascript" src="jquery.min.js"></script>
+        <script type="text/javascript" src="jquery.history.js"></script>
+        <script type="text/javascript" src="slippy.js"></script>
+        <!-- Slippy structural styles -->
+        <link type="text/css" rel="stylesheet" href="slippy.css"/>
+        <!-- Slippy theme -->
+        <link type="text/css" rel="stylesheet" href="slippy-pure.css"/>
+        <!-- Syntax highlighting core file  -->
+        <script type="text/javascript" src="highlighter/shCore.js"></script>
+        <!-- Syntax highlighting brushes, remove those you don't need -->
+        <script type="text/javascript" src="highlighter/shBrushJScript.js"></script>
+        <script type="text/javascript" src="highlighter/shBrushXml.js"></script>
+        <!-- Syntax highlighting styles-->
+        <link type="text/css" rel="stylesheet" href="highlighter/shCore.css"/>
+        <link type="text/css" rel="stylesheet" href="highlighter/shThemeEclipse.css"/>
+        <!-- Slippy init code -->
+        <script type="text/javascript">
+            $(function() {
+                $(".slide").slippy({
+                    // settings go here
+                    // possible values are:
+                    //  - animLen, duration for default animations (0 = disabled)
+                    //  - animInForward, receives a slide and animates it
+                    //  - animInRewind, receives a slide and animates it
+                    //  - animOutForward, receives a slide and animates it
+                    //  - animOutRewind, receives a slide and animates it
+                    //  - baseWidth, defines the base for img resizing, if you don't want only
+                    //    full-width images, specify this as the pixel width of a slide so that
+                    //    images are scaled properly (default is 620px wide)
+                    //  - ratio, defines the width/height ratio of the slides, defaults to 1.3 (620x476)
+                    //  - margin, the fraction of screen to use as slide margin, defaults to 0.15
+                    margin: 0.05,
+                    animLen : 100
+                });
+                SyntaxHighlighter.all();
+            });
+        </script>
+        <!-- Custom style for this deck -->
+        <style type="text/css">
+            .slide.nofooter {
+                border: 0;
+                background: 0;
+            }
+            li {
+                padding-top: 1em;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="slide big">
+            <div class="vcenter">
+                <h1>JavaScript quirks &<br />best practices</h1>
+            </div>
+        </div>
+        <div class="slide">
+            <h1>Things to consider before getting hands dirty with javascript</h1>
+            <ul>
+                <li class="incremental">Increased application complexity (js is not framework friendly)</li>
+                <li class="incremental">Harder application testing</li>
+                <li class="incremental">Platform compatibility issues</li>
+                <li class="incremental">Javascript might increase the price but not the value</li>
+            </ul>
+        </div>
+
+        <div class="slide big">
+            <div class="vcenter">
+                <h1>First things first</h1>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1 id='link'>Separate javascript and HTML</h1>
+            <p>Not OK:</p>
+            <pre class="brush: html">
+<a href="#" id="link" onclick="alert('hello')"></a>
+            </pre>
+            <div class="incremental">
+                <p>OK:</p>
+                <pre class="brush: js">
+                    document.getElementById('link').onclick = function() {
+                        alert("hello");
+                    };
+                </pre>
+            </div>
+            <div class="incremental">
+                <p>If using JQuery:</p>
+                <pre class="brush: js">
+                    $('#link').click(function() {
+                        alert("hello");
+                    });
+                </pre>
+            </div>
+            <div class="incremental">
+                Avoid 'spaghetti' code by having all JavaScript code in
+                javascript files
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Scope</h1>
+            <p>1)</p>
+            <pre class="brush: js eval">
+                foo = 42;
+                function test() {
+                    foo = 21;
+                }
+                test();
+                alert(foo);
+            </pre>
+            <div class="incremental">
+                <p>2)</p>
+                <pre class="brush: js eval incremental">
+                    var foo = 42;
+                    function test() {
+                        var foo = 21;
+                    }
+                    test();
+                    alert(foo);
+                </pre>
+            </div>
+        </div>
+        <div class="slide">
+            <h1>Pseudo namespaces</h1>
+            <p>1)</p>
+            <pre class="brush: js eval">
+                (function() {
+                    var x;
+                })();
+
+                alert(x);
+            </pre>
+            <div class="incremental">
+                <p>2)</p>
+                <pre class="brush: js eval incremental">
+                (function() {
+                    var x;
+                    window.foo = function() {alert("i am global");};
+                })();
+
+                window.foo();
+                </pre>
+            </div>
+        </div>
+        <div class="slide">
+            <h1>Equality and comparisons</h1>
+            <ul><li>
+                <p>The equality operator</p>
+                <pre class="brush: js">
+                ""           ==   "0"           // false
+                0            ==   ""            // true
+                0            ==   "0"           // true
+                false        ==   "false"       // false
+                false        ==   "0"           // true
+                false        ==   undefined     // false
+                false        ==   null          // false
+                null         ==   undefined     // true
+                " \t\r\n"    ==   0             // true
+                </pre>
+            </li>
+            <li class="incremental">
+                <p>The comparison operator</p>
+                <pre class="brush: js">
+                ""           ===   "0"           // false
+                0            ===   ""            // false
+                0            ===   "0"           // false
+                false        ===   "false"       // false
+                false        ===   "0"           // false
+                false        ===   undefined     // false
+                false        ===   null          // false
+                null         ===   undefined     // false
+                " \t\r\n"    ===   0             // false
+                </pre>
+            </li></ul>
+        </div>
+
+        <div class="slide">
+            <h1>Undefined and <i>null</i>:</h1>
+            <p>Undefined: a value and a variable<p>
+            <br />
+            <p>1)</p>
+            <pre class="brush: js eval">
+                var x;
+                alert(x === undefined);
+            </pre>
+            <div class="incremental">
+                <p>2)</p>
+                <pre class="brush: js eval">
+                    var x;
+                    undefined = 5;
+                    alert(x === undefined);
+                </pre>
+            </div>
+            <div class="incremental">
+                <p>3)</p>
+                <pre class="brush: js eval">
+                    var x;
+                    undefined = 5;
+                    undefined = x;
+                    alert(x === undefined);
+                </pre>
+            </div>
+            <div class="incremental" style="padding-top:1em">
+                <p><i style="color:blue">null</i> is just a value:</p>
+                <pre class="brush: js eval">
+                var x = null;
+                </pre>
+                <pre class="brush: js eval">
+                null = 4;
+                </pre>
+            </div>
+        </div>
+
+        <div class="slide">
+            <h1>Where undefined can be found</h1>
+            <ul>
+                <li>Accessing the (unmodified) global variable undefined.</li>
+                <li>Accessing a declared but not yet initialized variable</li>
+                <li>Implicit returns of functions due to missing return statements.</li>
+                <li>return statements which do not explicitly return anything.</li>
+                <li>Lookups of non-existent properties.</li>
+                <li>Function parameters which do not had any explicit value passed.</li>
+                <li>Anything that has been set to the value of undefined.</li>
+                <li>Any expression in the form of void(expression)</li>
+            </ul>
+        </div>
+
+        <div class="slide">
+            <h1>Everything is an object <br />(except <i>null</i> and <i>undefined</i>)</h1>
+            <pre class="brush: js eval">
+                alert(false.toString());
+            </pre>
+            <pre class="brush: js eval">
+                alert([1, 2, 3].toString());
+            </pre>
+            <pre class="brush: js eval">
+                2.toString();
+            </pre>
+            <pre class="brush: js eval">
+                2..toString(); // the second point is correctly recognized
+                2 .toString(); // note the space left to the dot
+                (2).toString(); // 2 is evaluated first
+            </pre>
+        </div>
+
+        <div class="slide">
+            <h1>Object as data type</h1>
+            1) <pre class="brush: js">
+                var o = {};</pre>
+            2) <pre class="brush: js">
+                var foo = {name: 'Kitten'};
+                foo.name; // kitten
+                foo['name']; // kitten
+            </pre>
+            3) <pre class="brush: js eval">
+                foo.1234 = 'test';
+            </pre>
+            4) <pre class="brush: js eval">
+                var foo = {name: 'Kitten'}
+                foo['1234'] = 'test';
+            </pre>
+            5) <pre class="brush: js">
+                var test = {
+                        'case': 'I am a keyword, so I must be notated as a string',
+                        delete: 'I am a keyword, so me too' // raises SyntaxError
+                };
+            </pre>
+        </div>
+
+        <div class="slide">
+            <h1>Object as data type</h1>
+            4) <pre class="brush: js eval">
+                var test = {
+                        case: 'I am a keyword',
+                        delete: 'I am a keyword'
+                };
+            </pre>
+            5) <pre class="brush: js eval">
+                var test = {
+                        'case': 'I am a keyword',
+                        'delete': 'I am a keyword'
+                };
+            </pre>
+        </div>
+
+        <div class="slide">
+            <h1>The mystery of <i>this</i></h1>
+            <pre class="brush: js">
+                this
+            </pre>
+            <pre class="brush: js">
+                foo();
+            </pre>
+            <pre class="brush: js">
+                bar.foo();
+            </pre>
+        </div>
+
+
+        <div class="slide">
+            <h1><i>for</i> and <i>for in</i>:</h1>
+        </div>
+
+
+        <div class="slide">
+            <h1>ALways avoid:</h1>
+            <ol>
+                <li>typeof</li>
+                <li>eval()</li>
+                <li>instanceof</li>
+                <li>setInterval()</li>
+            </ol>
+        </div>
+
+        <div class="slide">
+            <h1>User with care:</h1>
+            <ol>
+                <li>setTimeout()</li>
+            </ol>
+        </div>
+
+        <div class="slide">
+            <h1>ALways use:</h1>
+            <ol>
+                <li>semicolons</li>
+                <li><i>var</i> when declaring variable</li>
+                <li>use <i>"use strict"</i></li>
+            </ol>
+        </div>
+
+        <div class="slide big">
+            <h1>Thank you for your kind attention!</h1>
+            <img src="img/war.jpg" alt=""/>
+        </div>
+
+        <div class="layout" data-name="default">
+            <content></content>
+        </div>
+
+        <div class="footer">
+            <span class="left">Tautvilas Mečinskas</span>
+            <span class="right">Info source <a href="http://bonsaiden.github.com/JavaScript-Garden/">JavaScript Garden</a></span>
+            <span class="left"><a href="http://mediapark.lt/">mediapark.lt</a></span>
+            <span class="right">Powered by <a href="http://github.com/Seldaek/slippy/">slippy</a></span>
+            <hr class="defloat" />
+        </div>
+    </body>
+</html>
